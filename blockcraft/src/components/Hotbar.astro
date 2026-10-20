@@ -1,0 +1,15 @@
+---
+import { SCREENS } from '../config/site.config.js';
+import Icon from './Icon.astro';
+---
+<div class="hotbar-wrap">
+  <div class="hb-label" id="hb-label"></div>
+  <div class="hotbar" id="hotbar">
+    {SCREENS.map((s) => (
+      <div class="hb-slot" data-id={s.id} data-slot={s.slot} data-label={s.label}>
+        <span class="hb-num">{s.slot}</span>
+        <Icon name={s.item} alt={s.label} />
+      </div>
+    ))}
+  </div>
+</div>

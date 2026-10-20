@@ -1,0 +1,47 @@
+---
+import { MINIGAME } from '../config/site.config.js';
+import Icon from './Icon.astro';
+---
+<div class="mg-wrap" id="mg-wrap" hidden>
+  <div class="mg-scrim"></div>
+
+  <div class="gui mg">
+    <div class="mg-head">
+      <div>
+        <div class="gui-title">{MINIGAME.title}</div>
+        <div class="mg-hint">{MINIGAME.hint}</div>
+      </div>
+      <button class="mg-close" id="mg-close" type="button"
+              aria-label={MINIGAME.copy.close}>&#10005;</button>
+    </div>
+
+    <div class="mg-stats">
+      <div class="mg-stat">
+        <span class="mg-stat-l">{MINIGAME.copy.swings}</span>
+        <b id="mg-swings">0 / 0</b>
+      </div>
+      <div class="mg-stat">
+        <span class="mg-stat-l">{MINIGAME.copy.score}</span>
+        <b id="mg-score">0</b>
+      </div>
+      <div class="mg-legend">
+        {MINIGAME.ores.map((o) => (
+          <span class="mg-leg" title={o.name}>
+            <Icon name={o.icon} alt={o.name} />
+            <i>{o.key === 'magma' ? `-${o.cost}` : `+${o.xp}`}</i>
+          </span>
+        ))}
+        <span class="mg-leg mg-leg-goal" title={MINIGAME.amulet.name}>
+          <Icon name={MINIGAME.amulet.icon} alt={MINIGAME.amulet.name} />
+        </span>
+      </div>
+    </div>
+
+    <div class="mg-grid" id="mg-grid"></div>
+
+    <div class="mg-foot">
+      <div class="mg-msg" id="mg-msg"></div>
+      <button class="mc-btn" id="mg-again" type="button" hidden>{MINIGAME.copy.again}</button>
+    </div>
+  </div>
+</div>

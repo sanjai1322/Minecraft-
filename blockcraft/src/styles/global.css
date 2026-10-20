@@ -1,0 +1,824 @@
+/* ═══════════════════════════════════════════════════════════════
+   BLOCKCRAFT — Minecraft UI design system
+   Everything sized in container units against the 16:9 stage.
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Minecraft GUI palette — sampled from the real thing */
+  --gui-bg:      #c6c6c6;
+  --gui-dark:    #373737;
+  --gui-darker:  #1d1d1d;
+  --gui-light:   #ffffff;
+  --gui-shadow:  #555555;
+  --slot-bg:     #8b8b8b;
+  --slot-dark:   #373737;
+
+  --panel:       rgba(16, 16, 16, .88);
+  --tooltip-bg:  #100010;
+  --tooltip-edge:#2d0a63;
+
+  --text:        #ffffff;
+  --text-dim:    #a0a0a0;
+  --text-shadow: #3f3f3f;
+  --xp-green:    #7fdc3a;
+  --heart:       #e02b2b;
+  --hunger:      #cd7f32;
+
+  --rarity-common:    #ffffff;
+  --rarity-rare:      #55ffff;
+  --rarity-epic:      #ff55ff;
+  --rarity-legendary: #ffaa00;
+
+  --accent: #7ac74f;
+  --accent-2: #ffd966;
+
+  --ease: cubic-bezier(.2, .9, .3, 1);
+}
+
+html, body {
+  height: 100%;
+  background: #000;
+  color: var(--text);
+  font-family: 'Pixelify Sans', 'Courier New', monospace;
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+body { display: grid; place-items: center; }
+
+[data-screen="hero"]         { --accent: #7ac74f; --accent-2: #ffd966; }
+[data-screen="about"]        { --accent: #ff9ec7; --accent-2: #8fd96a; }
+[data-screen="skills"]       { --accent: #a879e6; --accent-2: #3fd9c9; }
+[data-screen="projects"]     { --accent: #e8a33d; --accent-2: #4fd6e0; }
+[data-screen="experience"]   { --accent: #a8d8f0; --accent-2: #ff8c42; }
+[data-screen="achievements"] { --accent: #1fd6d6; --accent-2: #5b8cff; }
+[data-screen="services"]     { --accent: #3fcf6f; --accent-2: #e8b84f; }
+[data-screen="contact"]      { --accent: #6fd943; --accent-2: #ffd24a; }
+[data-screen="outro"]        { --accent: #c46fe8; --accent-2: #f0e68c; }
+
+/* text shadow — Minecraft's signature offset drop shadow */
+.mc-text { text-shadow: .12cqw .12cqw 0 var(--text-shadow); }
+
+/* ── STAGE ─────────────────────────────────────────────────── */
+.stage {
+  position: relative;
+  width: 100vw;
+  max-width: calc(100vh * 16 / 9);
+  aspect-ratio: 16 / 9;
+  container-type: size;
+  background: #0a0a0a;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── PLATES ────────────────────────────────────────────────── */
+.plates { position: absolute; inset: 0; z-index: 0; }
+.plate {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity .4s var(--ease);
+  background-size: cover; background-position: center;
+  image-rendering: pixelated;
+}
+.plate.on { opacity: 1; }
+.plate video {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  image-rendering: pixelated;
+}
+
+.plate[data-missing="true"] {
+  background-image: linear-gradient(to bottom,
+    var(--f0) 0%, var(--f1) 55%, var(--f2) 100%);
+}
+.plate[data-missing="true"]::after {
+  content: attr(data-label);
+  position: absolute; left: 50%; top: 46%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2cqw; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+  border: .2cqw solid rgba(255,255,255,.25);
+  padding: 1cqw 2cqw; text-align: center; line-height: 1.9;
+  background: rgba(0,0,0,.42);
+}
+
+/* Scrim when a machine panel is open.
+   Not a flat wash — it darkens only the third the panel sits on and
+   feathers to nothing across the rest, so the loop stays watchable.
+   Side is chosen by `align` in site.config.js, via [data-align]. */
+.dim {
+  position: absolute; inset: 0; z-index: 6;
+  background: radial-gradient(ellipse 82% 82% at 50% 50%,
+              rgba(0,0,0,0) 45%, rgba(0,0,0,.34) 100%);
+  opacity: 0; transition: opacity .35s var(--ease);
+  pointer-events: none;
+}
+.dim.on { opacity: 1; }
+
+.stage[data-align="left"] .dim {
+  background:
+    linear-gradient(to right,
+      rgba(0,0,0,.74) 0%, rgba(0,0,0,.46) 28%,
+      rgba(0,0,0,.08) 56%, rgba(0,0,0,0) 74%),
+    radial-gradient(ellipse 82% 82% at 50% 50%,
+      rgba(0,0,0,0) 45%, rgba(0,0,0,.34) 100%);
+}
+.stage[data-align="right"] .dim {
+  background:
+    linear-gradient(to left,
+      rgba(0,0,0,.74) 0%, rgba(0,0,0,.46) 28%,
+      rgba(0,0,0,.08) 56%, rgba(0,0,0,0) 74%),
+    radial-gradient(ellipse 82% 82% at 50% 50%,
+      rgba(0,0,0,0) 45%, rgba(0,0,0,.34) 100%);
+}
+
+/* ── SCREENS ───────────────────────────────────────────────── */
+.screen {
+  position: absolute; inset: 0; z-index: 10;
+  opacity: 0; visibility: hidden;
+  transition: opacity .25s, visibility .25s;
+  display: grid; place-items: center;
+  /* bottom gap clears the XP bar, hunger pips and hotbar */
+  padding: 4cqh 5cqw 19cqh;
+}
+.screen.on { opacity: 1; visibility: visible; }
+
+.stage[data-align="left"]  .screen { justify-items: start; }
+.stage[data-align="right"] .screen { justify-items: end; }
+.stage[data-valign="top"]  .screen { align-items: start; }
+
+/* ═══════════════════════════════════════════════════════════
+   THE GUI PANEL — the base for every machine
+   Minecraft's 3px bevelled border, recreated in box-shadow
+   ═══════════════════════════════════════════════════════════ */
+.gui {
+  position: relative;
+  background: rgba(18, 18, 21, .70);
+  backdrop-filter: blur(.45cqw) saturate(1.15);
+  -webkit-backdrop-filter: blur(.45cqw) saturate(1.15);
+  padding: 1.5cqw;
+  box-shadow:
+    inset .28cqw .28cqw 0 rgba(255,255,255,.17),
+    inset -.28cqw -.28cqw 0 rgba(0,0,0,.6),
+    0 0 0 .28cqw rgba(0,0,0,.88),
+    0 1cqw 3cqw rgba(0,0,0,.5);
+  color: #e2e2e2;
+  max-width: 46cqw;
+}
+.gui-title {
+  font-size: 1.5cqw; font-weight: 600;
+  color: #fff; margin-bottom: 1cqw;
+  letter-spacing: .02em;
+  text-shadow: .12cqw .12cqw 0 rgba(0,0,0,.8);
+}
+.gui-hint {
+  font-size: .95cqw; color: #9a9a9a;
+  margin-top: 1cqw; font-style: italic;
+}
+
+/* inventory slot — mid-grey backing like a real Minecraft slot, so
+   dark item art (the written book, the dragon head) still reads. The
+   slot is the frame; the loop already shows through the panel around it. */
+.slot {
+  width: 4.4cqw; height: 4.4cqw;
+  background: rgba(122, 122, 128, .5);
+  box-shadow:
+    inset .24cqw .24cqw 0 rgba(0,0,0,.5),
+    inset -.24cqw -.24cqw 0 rgba(255,255,255,.22);
+  display: grid; place-items: center;
+  /* icons size off this — ~73% of the slot, like a real inventory */
+  font-size: 3.2cqw; cursor: pointer;
+  position: relative;
+  transition: background .12s;
+}
+.slot:hover { background: rgba(158, 158, 164, .62); }
+.slot.empty { cursor: default; opacity: .4; }
+.slot.empty:hover { background: rgba(122, 122, 128, .5); }
+
+/* ── ICONS ─────────────────────────────────────────────────────
+   <Icon> renders either an <img> (config value starts with "/")
+   or literal text. Images size themselves off the inherited
+   font-size so both forms drop into the same slots. */
+.icon { line-height: 1; image-rendering: pixelated; }
+img.icon {
+  display: inline-block;
+  width: 1em; height: 1em;
+  object-fit: contain;
+  vertical-align: -.12em;
+  /* crisp offset shadow like a real item sprite — also gives dark
+     icons a defined edge against whatever sits behind them */
+  filter: drop-shadow(0.06em 0.06em 0 rgba(0,0,0,.55));
+}
+
+/* ── TOOLTIP ───────────────────────────────────────────────── */
+.tooltip {
+  position: fixed; z-index: 300;
+  background: var(--tooltip-bg);
+  border: .22cqw solid var(--tooltip-edge);
+  padding: .7cqw 1cqw;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .12s;
+  min-width: 12cqw; max-width: 26cqw;
+}
+.tooltip.on { opacity: 1; }
+.tooltip-name { font-size: 1.15cqw; margin-bottom: .2cqw; }
+.tooltip-lore { font-size: .95cqw; color: #a8a8ff; font-style: italic; line-height: 1.4; }
+.tooltip-meta { font-size: .88cqw; color: #7a7a7a; margin-top: .3cqw; }
+
+/* ── HOTBAR — the navigation ───────────────────────────────── */
+.hotbar-wrap {
+  position: absolute; left: 50%; bottom: 2.4cqh;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex; flex-direction: column; align-items: center; gap: .6cqw;
+}
+
+.hotbar {
+  display: flex;
+  background: rgba(0, 0, 0, .55);
+  box-shadow: 0 0 0 .22cqw rgba(0,0,0,.7);
+  padding: .22cqw;
+}
+.hb-slot {
+  position: relative;
+  width: 4.6cqw; height: 4.6cqw;
+  display: grid; place-items: center;
+  font-size: 3.3cqw;
+  cursor: pointer;
+  /* mid-grey backing so dark item art reads on the dark hotbar bar */
+  background: rgba(122, 122, 128, .42);
+  box-shadow:
+    inset 0 0 0 .18cqw rgba(255,255,255,.14),
+    inset .2cqw .2cqw 0 rgba(0,0,0,.32),
+    inset -.2cqw -.2cqw 0 rgba(255,255,255,.16);
+  transition: transform .12s;
+}
+.hb-slot:hover { transform: translateY(-.3cqw); }
+.hb-slot.sel::after {
+  content: '';
+  position: absolute; inset: -.42cqw;
+  border: .42cqw solid #fff;
+  box-shadow: 0 0 0 .18cqw rgba(0,0,0,.75);
+  pointer-events: none;
+}
+.hb-num {
+  position: absolute; top: .1cqw; left: .28cqw;
+  font-size: .82cqw; color: rgba(255,255,255,.5);
+}
+.hb-slot.done .hb-num { color: var(--xp-green); }
+
+.hb-label {
+  font-size: 1.15cqw; color: #fff;
+  text-shadow: .12cqw .12cqw 0 var(--text-shadow);
+  height: 1.5cqw;
+  opacity: 0; transition: opacity .2s;
+}
+.hb-label.on { opacity: 1; }
+
+/* ── PLAYER HUD ────────────────────────────────────────────── */
+.hud { position: absolute; inset: 0; z-index: 45; pointer-events: none; }
+
+/* Stacked bottom-up like the real game: hotbar, then the XP bar with
+   its level number, then hearts and hunger. The hotbar block is about
+   11.4cqh tall from the stage floor, so everything here clears that. */
+.bars {
+  position: absolute; left: 50%; bottom: 15.2cqh;
+  transform: translateX(-50%);
+  width: 41cqw;
+  display: flex; justify-content: space-between;
+}
+.hearts, .hunger { display: flex; gap: .12cqw; }
+.pip { font-size: 1.6cqw; line-height: 1; filter: drop-shadow(.1cqw .1cqw 0 rgba(0,0,0,.7)); }
+.pip.off { opacity: .28; filter: grayscale(1) brightness(.4); }
+
+.xp-wrap {
+  position: absolute; left: 50%; bottom: 12.2cqh;
+  transform: translateX(-50%);
+  width: 41cqw; height: .9cqw;
+  background: #1c1c1c;
+  box-shadow: 0 0 0 .18cqw rgba(0,0,0,.7);
+}
+.xp-fill {
+  height: 100%; width: 0;
+  background: var(--xp-green);
+  box-shadow: inset 0 -.2cqw 0 rgba(0,0,0,.25);
+  transition: width .7s var(--ease);
+}
+.xp-level {
+  position: absolute; left: 50%; bottom: 11.9cqh;
+  transform: translateX(-50%);
+  font-size: 1.6cqw; color: var(--xp-green);
+  text-shadow:
+    .14cqw 0 0 #000, -.14cqw 0 0 #000,
+    0 .14cqw 0 #000, 0 -.14cqw 0 #000;
+  z-index: 46;
+}
+
+/* ── TOP-LEFT: world info ──────────────────────────────────── */
+/* Screens with no scrim (title, credits) put text straight over bright
+   footage, so the flat Minecraft shadow isn't enough on its own — the
+   title, credits and world-info text get a soft dark halo underneath. */
+.world-info {
+  position: absolute; left: 2cqw; top: 2cqh;
+  font-size: 1cqw; line-height: 1.7;
+  color: #fff;
+  text-shadow:
+    .12cqw .12cqw 0 var(--text-shadow),
+    0 0 .6cqw rgba(0,0,0,.8);
+}
+.world-info b { color: var(--accent); transition: color .4s; }
+
+/* ── ADVANCEMENT TOAST ─────────────────────────────────────── */
+.toast {
+  position: absolute; right: 2cqw; top: 2cqh; z-index: 70;
+  display: flex; align-items: center; gap: 1cqw;
+  background: #241a10;
+  box-shadow: 0 0 0 .22cqw #6b5230, 0 .4cqw 1.4cqw rgba(0,0,0,.6);
+  padding: .8cqw 1.4cqw .8cqw 1cqw;
+  opacity: 0; transform: translateY(-2cqw);
+  pointer-events: none;
+}
+.toast-ico { font-size: 2.9cqw; }
+.toast-kicker { font-size: .92cqw; color: var(--accent-2); transition: color .4s; }
+.toast-name { font-size: 1.25cqw; color: #fff; }
+
+/* ═══════════════════════════════════════════════════════════
+   TITLE SCREEN — laid out like the real main menu:
+   logo up top, splash rotated off its upper right, then a
+   stacked button menu. Buttons come from TITLE in the config.
+   ═══════════════════════════════════════════════════════════ */
+.title-screen {
+  text-align: center;
+  padding-top: 3cqh;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* the splash hangs off the logo, so the logo needs to be a
+   positioning context rather than a plain block */
+.logo-wrap { position: relative; display: inline-block; }
+
+.mc-logo {
+  font-size: 7cqw; line-height: 1;
+  color: #fff;
+  letter-spacing: .02em;
+  /* chunky extruded drop, the way the real wordmark reads */
+  text-shadow:
+    .16cqw .16cqw 0 #4a4a4a,
+    .32cqw .32cqw 0 #2d2d2d,
+    .48cqw .48cqw 0 #1a1a1a,
+    0 0 2.4cqw rgba(0,0,0,.7);
+}
+
+/* Anchored from the left so the text grows away from the wordmark —
+   anchoring the right edge sends long splashes back across the logo. */
+.splash {
+  position: absolute;
+  left: calc(100% - 3cqw); bottom: .2cqw;
+  transform-origin: left center;
+  transform: rotate(-18deg);
+  font-size: 1.3cqw; color: #ffff55;
+  white-space: nowrap;
+  text-shadow: .13cqw .13cqw 0 #3f3f00, 0 0 .7cqw rgba(0,0,0,.8);
+  pointer-events: none;
+}
+
+.mc-sub {
+  font-size: 1.25cqw; color: #d0d0d0;
+  margin-top: .9cqw;
+  letter-spacing: .18em; text-transform: uppercase;
+  text-shadow:
+    .12cqw .12cqw 0 var(--text-shadow),
+    0 0 .55cqw rgba(0,0,0,.85),
+    0 0 1.4cqw rgba(0,0,0,.6);
+}
+
+/* ── the menu ──────────────────────────────────────────────── */
+.menu {
+  margin-top: 3.2cqh;
+  display: flex; flex-direction: column; gap: .7cqh;
+  width: 27cqw;
+}
+.menu-row { display: flex; gap: .6cqw; }
+.menu-row .menu-btn { flex: 1; }
+
+.menu-btn {
+  margin-top: 0;
+  padding: .85cqw 1cqw;
+  width: 100%;
+  text-align: center;
+  font-size: 1.15cqw;
+}
+
+.title-hint {
+  margin-top: 2.4cqh; font-size: 1cqw;
+  color: rgba(255,255,255,.85);
+  text-shadow:
+    .12cqw .12cqw 0 var(--text-shadow),
+    0 0 .55cqw rgba(0,0,0,.85),
+    0 0 1.4cqw rgba(0,0,0,.6);
+}
+
+/* bottom-left legal line, like the copyright on the real menu */
+.title-footer {
+  position: absolute; left: 2cqw; bottom: 2cqh;
+  font-size: .85cqw; color: rgba(255,255,255,.6);
+  text-shadow: .1cqw .1cqw 0 #000, 0 0 .5cqw rgba(0,0,0,.8);
+  pointer-events: none;
+}
+
+/* ── PROFILE (About) ───────────────────────────────────────── */
+.profile { display: flex; gap: 1.8cqw; align-items: flex-start; }
+.profile-avatar {
+  width: 11cqw; height: 11cqw; flex: none;
+  background: rgba(0,0,0,.38);
+  box-shadow: inset .24cqw .24cqw 0 rgba(0,0,0,.55), inset -.24cqw -.24cqw 0 rgba(255,255,255,.2);
+  display: grid; place-items: center; font-size: 8cqw;
+}
+.profile-body { flex: 1; }
+.profile-bio {
+  font-size: 1.08cqw; line-height: 1.6;
+  color: #cfcfcf; margin-bottom: 1cqw; max-width: 26cqw;
+}
+.stat-line {
+  display: flex; justify-content: space-between; gap: 1.4cqw;
+  padding: .42cqw 0;
+  border-bottom: .16cqw solid rgba(255,255,255,.13);
+  font-size: 1.02cqw;
+}
+.stat-line b { color: #fff; }
+.stat-line span { color: #b4b4b4; }
+
+/* ── ENCHANTMENT TABLE (Skills) ────────────────────────────── */
+.ench-row {
+  display: flex; align-items: center; gap: 1cqw;
+  padding: .5cqw .7cqw;
+  margin-bottom: .35cqw;
+  background: rgba(255,255,255,.08);
+  box-shadow: inset .2cqw .2cqw 0 rgba(0,0,0,.4), inset -.2cqw -.2cqw 0 rgba(255,255,255,.13);
+  cursor: pointer;
+  transition: background .12s;
+}
+.ench-row:hover { background: rgba(255,255,255,.16); }
+.ench-lvl {
+  width: 3cqw; flex: none; text-align: center;
+  font-size: 1.15cqw; color: #ffff55;
+  text-shadow: .12cqw .12cqw 0 #3f3f00;
+}
+.ench-name { flex: 1; font-size: 1.08cqw; color: #fff; text-shadow: .12cqw .12cqw 0 #2a2a2a; }
+.ench-bar {
+  width: 13cqw; height: .7cqw; flex: none;
+  background: #3a3a3a;
+  box-shadow: inset .14cqw .14cqw 0 #222;
+  position: relative; overflow: hidden;
+}
+.ench-fill {
+  position: absolute; inset: 0 auto 0 0; width: 0;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+}
+.ench-cost {
+  width: 2.6cqw; text-align: right; flex: none;
+  font-size: 1cqw; color: #7fdc3a;
+  text-shadow: .1cqw .1cqw 0 #1a3a0a;
+}
+
+/* ── CHEST GRID (Projects) ─────────────────────────────────── */
+.chest-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 4.4cqw);
+  gap: .3cqw;
+}
+.slot .rarity-dot {
+  position: absolute; right: .18cqw; bottom: .18cqw;
+  width: .5cqw; height: .5cqw;
+}
+.rarity-common    { background: var(--rarity-common); }
+.rarity-rare      { background: var(--rarity-rare); }
+.rarity-epic      { background: var(--rarity-epic); }
+.rarity-legendary { background: var(--rarity-legendary); }
+
+/* ── CRAFTING TABLE (Experience) ───────────────────────────── */
+.craft-row {
+  display: flex; align-items: center; gap: 1.4cqw;
+  padding: .9cqw 0;
+  border-bottom: .16cqw solid rgba(255,255,255,.13);
+}
+.craft-row:last-child { border-bottom: 0; }
+.craft-inputs { display: flex; gap: .3cqw; flex: none; }
+.craft-inputs .slot { width: 3.2cqw; height: 3.2cqw; font-size: 2.3cqw; cursor: default; }
+.craft-arrow { font-size: 2cqw; color: #9a9a9a; flex: none; }
+.craft-out { flex: 1; }
+.craft-year { font-size: .92cqw; color: #9a9a9a; letter-spacing: .1em; }
+.craft-name { font-size: 1.22cqw; color: #fff; font-weight: 600; }
+.craft-lore { font-size: .98cqw; color: #c0c0c0; line-height: 1.4; }
+
+/* ── ADVANCEMENTS ──────────────────────────────────────────── */
+.adv-grid { display: flex; flex-direction: column; gap: .5cqw; }
+.adv {
+  display: flex; align-items: center; gap: 1cqw;
+  padding: .6cqw .9cqw;
+  background: rgba(255,255,255,.08);
+  box-shadow: inset .2cqw .2cqw 0 rgba(0,0,0,.4), inset -.2cqw -.2cqw 0 rgba(255,255,255,.13);
+  position: relative;
+}
+.adv.locked { opacity: .45; }
+.adv-ico {
+  width: 3cqw; height: 3cqw; flex: none;
+  display: grid; place-items: center; font-size: 2.2cqw;
+  background: rgba(0,0,0,.42);
+  box-shadow: inset .16cqw .16cqw 0 rgba(0,0,0,.6);
+}
+.adv.done .adv-ico { box-shadow: inset 0 0 0 .2cqw #ffd966, inset .16cqw .16cqw 0 #3a3a3a; }
+.adv-name { font-size: 1.1cqw; color: #fff; text-shadow: .12cqw .12cqw 0 #2a2a2a; }
+.adv-lore { font-size: .95cqw; color: #d0d0d0; font-style: italic; }
+.adv-tick { margin-left: auto; font-size: 1.6cqw; color: var(--xp-green); }
+
+/* ── VILLAGER TRADES (Services) ────────────────────────────── */
+.trade-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: .9cqw;
+}
+.trade-lvl { font-size: 1cqw; color: #a8a8a8; }
+.trade-row {
+  display: flex; align-items: center; gap: 1cqw;
+  padding: .55cqw .7cqw; margin-bottom: .35cqw;
+  background: rgba(255,255,255,.08);
+  box-shadow: inset .2cqw .2cqw 0 rgba(0,0,0,.4), inset -.2cqw -.2cqw 0 rgba(255,255,255,.13);
+  cursor: pointer; transition: background .12s;
+}
+.trade-row:hover { background: rgba(255,255,255,.16); }
+.trade-give { display: flex; align-items: center; gap: .3cqw; flex: none; width: 6cqw; }
+.trade-give .em { font-size: 2.2cqw; }
+.trade-qty { font-size: 1.15cqw; color: #fff; text-shadow: .12cqw .12cqw 0 #2a2a2a; }
+.trade-arrow { flex: none; font-size: 1.9cqw; color: #d0d0d0; }
+.trade-get { flex: none; font-size: 2.2cqw; }
+.trade-body { flex: 1; }
+.trade-name { font-size: 1.1cqw; color: #fff; text-shadow: .12cqw .12cqw 0 #2a2a2a; }
+.trade-lore { font-size: .95cqw; color: #d0d0d0; font-style: italic; }
+.trade-stock { flex: none; font-size: .9cqw; color: var(--xp-green); }
+
+.trade-stats { display: flex; gap: .6cqw; margin-top: 1cqw; }
+.tstat {
+  flex: 1; text-align: center; padding: .7cqw;
+  background: rgba(255,255,255,.08);
+  box-shadow: inset .2cqw .2cqw 0 rgba(0,0,0,.4), inset -.2cqw -.2cqw 0 rgba(255,255,255,.13);
+}
+.tstat b { display: block; font-size: 1.7cqw; color: #fff; text-shadow: .12cqw .12cqw 0 #2a2a2a; }
+.tstat span { font-size: .85cqw; color: #d0d0d0; letter-spacing: .1em; text-transform: uppercase; }
+
+/* ── WRITTEN BOOK (Contact) ────────────────────────────────── */
+.book {
+  background: #d8c9a0;
+  box-shadow:
+    inset .3cqw .3cqw 0 #efe4c8,
+    inset -.3cqw -.3cqw 0 #a8956a,
+    0 0 0 .3cqw #3a2f18,
+    0 1cqw 3cqw rgba(0,0,0,.6);
+  padding: 1.8cqw 2.2cqw;
+  width: 34cqw;
+  color: #3a2f18;
+}
+.book-head { font-size: 1.7cqw; margin-bottom: .3cqw; }
+.book-intro { font-size: 1.02cqw; font-style: italic; color: #6a5a38; margin-bottom: 1.2cqw; }
+.book-line {
+  display: flex; align-items: center; gap: 1cqw;
+  padding: .55cqw 0;
+  border-bottom: .14cqw dotted #a8956a;
+  cursor: pointer;
+  transition: padding-left .14s;
+}
+.book-line:hover { padding-left: .5cqw; }
+.book-ico { font-size: 2.1cqw; flex: none; }
+.book-l { font-size: .88cqw; color: #8a7a52; letter-spacing: .14em; text-transform: uppercase; }
+.book-v { font-size: 1.12cqw; color: #3a2f18; }
+.book-page { text-align: right; font-size: .9cqw; color: #8a7a52; margin-top: 1cqw; }
+
+/* ── CREDITS (Outro) ───────────────────────────────────────── */
+.credits { text-align: center; }
+.credits-kicker {
+  font-size: 1.05cqw; letter-spacing: .4em; text-transform: uppercase;
+  color: rgba(255,255,255,.9);
+  text-shadow:
+    .12cqw .12cqw 0 var(--text-shadow),
+    0 0 .55cqw rgba(0,0,0,.85),
+    0 0 1.4cqw rgba(0,0,0,.6);
+}
+.credits-title {
+  font-size: 5cqw; margin-top: .6cqw; color: #fff;
+  text-shadow: .18cqw .18cqw 0 #2d2d2d, .36cqw .36cqw 0 #1a1a1a;
+}
+.credits-line {
+  font-size: 1.3cqw; color: var(--accent);
+  margin-top: .6cqw; transition: color .4s;
+  text-shadow:
+    .12cqw .12cqw 0 #1a1a1a,
+    0 0 .55cqw rgba(0,0,0,.85),
+    0 0 1.4cqw rgba(0,0,0,.6);
+}
+
+/* ── BUTTON ────────────────────────────────────────────────── */
+.mc-btn {
+  display: inline-block;
+  margin-top: 1.4cqw;
+  padding: .7cqw 2cqw;
+  background: #8b8b8b;
+  color: #fff;
+  /* native <button> elements don't inherit the page font — without
+     this, button-based .mc-btn (Mine for the Amulet, New Dig Site)
+     fall back to Arial */
+  font-family: inherit;
+  border: 0;
+  font-size: 1.15cqw; letter-spacing: .04em;
+  text-shadow: .12cqw .12cqw 0 #2a2a2a;
+  cursor: pointer;
+  box-shadow:
+    inset .26cqw .26cqw 0 #c6c6c6,
+    inset -.26cqw -.26cqw 0 #545454,
+    0 0 0 .22cqw #000;
+  transition: background .12s;
+}
+.mc-btn:hover { background: #a0a0c0; }
+.mc-btn:active {
+  box-shadow:
+    inset -.26cqw -.26cqw 0 #c6c6c6,
+    inset .26cqw .26cqw 0 #545454,
+    0 0 0 .22cqw #000;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ANCIENT EXCAVATION — the mini-game
+   Opens over whatever screen you were on, like a container GUI.
+   ═══════════════════════════════════════════════════════════ */
+.mg-wrap {
+  position: absolute; inset: 0; z-index: 120;
+  display: grid; place-items: center;
+}
+.mg-wrap[hidden] { display: none; }
+.mg-scrim { position: absolute; inset: 0; background: rgba(0,0,0,.62); }
+
+.mg {
+  position: relative;
+  width: 56cqw; max-width: 56cqw;
+  animation: mg-in .28s var(--ease);
+}
+@keyframes mg-in {
+  from { opacity: 0; transform: scale(.95) translateY(1.4cqh); }
+  to   { opacity: 1; transform: none; }
+}
+
+.mg-head { display: flex; align-items: flex-start; gap: 1cqw; }
+.mg-head .gui-title { margin-bottom: .3cqw; }
+.mg-hint { font-size: .92cqw; color: #9a9a9a; font-style: italic; max-width: 40cqw; }
+
+.mg-close {
+  margin-left: auto; flex: none;
+  width: 2.4cqw; height: 2.4cqw;
+  background: rgba(255,255,255,.08);
+  box-shadow: inset .18cqw .18cqw 0 rgba(0,0,0,.4), inset -.18cqw -.18cqw 0 rgba(255,255,255,.13);
+  color: #d8d8d8; font-family: inherit; font-size: 1.1cqw;
+  border: 0; cursor: pointer; line-height: 1;
+}
+.mg-close:hover { background: rgba(255,255,255,.18); color: #fff; }
+
+/* ── status strip ──────────────────────────────────────────── */
+.mg-stats {
+  display: flex; align-items: center; gap: 1.4cqw;
+  margin: 1cqw 0 .8cqw;
+  padding: .55cqw .8cqw;
+  background: rgba(0,0,0,.3);
+  box-shadow: inset .18cqw .18cqw 0 rgba(0,0,0,.45);
+}
+.mg-stat { display: flex; align-items: baseline; gap: .45cqw; }
+.mg-stat-l {
+  font-size: .8cqw; letter-spacing: .12em; text-transform: uppercase; color: #8f8f8f;
+}
+.mg-stat b { font-size: 1.25cqw; color: #fff; }
+
+.mg-legend { margin-left: auto; display: flex; align-items: center; gap: .75cqw; }
+.mg-leg { display: flex; align-items: center; gap: .18cqw; font-size: 1.5cqw; }
+.mg-leg i { font-size: .82cqw; font-style: normal; color: #9a9a9a; }
+.mg-leg-goal { filter: drop-shadow(0 0 .5cqw var(--accent-2)); }
+
+/* ── the grid ──────────────────────────────────────────────── */
+.mg-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--mg-cols, 9), 1fr);
+  gap: .3cqw;
+}
+
+.mg-cell {
+  aspect-ratio: 1;
+  border: 0; padding: 0; margin: 0;
+  font-family: inherit;
+  cursor: pointer;
+  display: grid; place-items: center;
+  font-size: 2.4cqw;
+  /* undug stone */
+  background: #6f6f6f;
+  box-shadow:
+    inset .22cqw .22cqw 0 #8d8d8d,
+    inset -.22cqw -.22cqw 0 #4a4a4a;
+  transition: background .1s, transform .1s;
+}
+.mg-cell:not(:disabled):hover {
+  background: #838383;
+  transform: translateY(-.12cqw);
+}
+.mg-cell:not(:disabled):active { transform: translateY(.05cqw); }
+
+.mg-cell.dug {
+  cursor: default;
+  background: rgba(0,0,0,.42);
+  box-shadow: inset .2cqw .2cqw 0 rgba(0,0,0,.6);
+}
+.mg-cell.ore   { background: rgba(255,255,255,.1); }
+.mg-cell.magma { background: rgba(180,60,20,.35); }
+
+.mg-cell.amulet {
+  background: rgba(255,214,102,.22);
+  box-shadow: inset 0 0 0 .22cqw var(--accent-2), inset .2cqw .2cqw 0 rgba(0,0,0,.4);
+  animation: mg-glow 1.1s ease-in-out infinite alternate;
+}
+@keyframes mg-glow {
+  from { filter: drop-shadow(0 0 .3cqw var(--accent-2)); }
+  to   { filter: drop-shadow(0 0 1.3cqw var(--accent-2)); }
+}
+
+/* distance readout — hotter number means closer */
+.mg-dist { font-size: 1.35cqw; font-weight: 600; }
+.heat-0, .heat-1 { color: #ff5a4a; text-shadow: 0 0 .5cqw rgba(255,90,74,.7); }
+.heat-2 { color: #ffb03a; }
+.heat-3 { color: #d8d86a; }
+.heat-4 { color: #6fa8d6; }
+
+/* ── footer ────────────────────────────────────────────────── */
+.mg-foot {
+  display: flex; align-items: center; gap: 1cqw;
+  margin-top: .9cqw; min-height: 3.2cqw;
+}
+.mg-msg { flex: 1; font-size: 1.02cqw; color: #c8c8c8; }
+.mg-msg.good { color: var(--xp-green); }
+.mg-msg.bad  { color: #ff7a6a; }
+.mg-msg.win  { color: var(--accent-2); font-size: 1.2cqw; }
+.mg-foot .mc-btn { margin-top: 0; flex: none; }
+.mg-foot .mc-btn[hidden] { display: none; }
+
+.menu-play { margin-top: .7cqh; }
+
+/* ── F3 DEBUG OVERLAY ──────────────────────────────────────── */
+.f3 {
+  position: absolute; inset: 0; z-index: 200;
+  padding: 2cqw;
+  font-size: .95cqw; line-height: 1.6;
+  color: #fff; text-shadow: .1cqw .1cqw 0 #000;
+  pointer-events: none;
+  display: none;
+}
+.f3.on { display: block; }
+.f3 span { background: rgba(0,0,0,.42); padding: 0 .2cqw; }
+.f3-l { position: absolute; left: 2cqw; top: 2cqh; }
+.f3-r { position: absolute; right: 2cqw; top: 2cqh; text-align: right; }
+
+/* ── SPLASH / LOADING ──────────────────────────────────────── */
+.loading {
+  position: fixed; inset: 0; z-index: 500;
+  display: grid; place-items: center;
+  background: #0f0f0f;
+  container-type: size;
+}
+.loading-in { text-align: center; width: 44cqw; max-width: 90vw; }
+.loading-title { font-size: 3.4cqw; color: #fff; text-shadow: .18cqw .18cqw 0 #2d2d2d; }
+.loading-sub { font-size: 1.15cqw; color: #ffff55; margin-top: .3cqw; }
+.loading-bar {
+  height: 1.1cqw; margin-top: 2cqw;
+  background: #1c1c1c;
+  box-shadow: 0 0 0 .22cqw #000;
+}
+.loading-fill { height: 100%; width: 0; background: var(--xp-green); }
+.loading-tip { margin-top: .8cqw; font-size: .95cqw; color: #8a8a8a; }
+
+/* ── KEYS ──────────────────────────────────────────────────── */
+.keys {
+  position: fixed; left: 50%; bottom: .5rem; transform: translateX(-50%);
+  z-index: 210; display: flex; gap: 12px;
+  font-size: 11px; letter-spacing: .06em;
+  color: rgba(255,255,255,.32); pointer-events: none;
+}
+.keys kbd {
+  border: 1px solid rgba(255,255,255,.2);
+  padding: 1px 5px; font-family: inherit; font-size: 10px;
+  color: rgba(255,255,255,.6);
+}
+@media (max-width: 760px) { .keys { display: none; } }
+
+a { text-decoration: none; color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+  .loading { display: none; }
+}

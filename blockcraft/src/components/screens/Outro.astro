@@ -1,0 +1,11 @@
+---
+import { OUTRO } from '../../config/site.config.js';
+---
+<section class="screen" data-s="outro">
+  <div class="credits">
+    <div class="credits-kicker">{OUTRO.kicker}</div>
+    <div class="credits-title">{OUTRO.title}</div>
+    {OUTRO.lines.map((l) => (<div class="credits-line">{l}</div>))}
+    <div class="mc-btn" data-go={OUTRO.goTo}>Respawn</div>
+  </div>
+</section>

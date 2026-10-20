@@ -1,0 +1,19 @@
+---
+import { ABOUT, ICONS, SITE } from '../../config/site.config.js';
+import Icon from '../Icon.astro';
+---
+<section class="screen" data-s="about">
+  <div class="gui">
+    <div class="gui-title">{ABOUT.title}</div>
+    <div class="profile">
+      <div class="profile-avatar"><Icon name={ICONS.avatar} /></div>
+      <div class="profile-body">
+        <p class="profile-bio">{ABOUT.bio}</p>
+        {ABOUT.stats.map((s) => (
+          <div class="stat-line"><b>{s.label}</b><span>{s.value}</span></div>
+        ))}
+        <div class="mc-btn" data-go={ABOUT.goTo}>View Journey</div>
+      </div>
+    </div>
+  </div>
+</section>

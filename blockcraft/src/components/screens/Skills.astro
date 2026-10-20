@@ -1,0 +1,17 @@
+---
+import { SKILLS } from '../../config/site.config.js';
+---
+<section class="screen" data-s="skills">
+  <div class="gui">
+    <div class="gui-title">{SKILLS.title}</div>
+    {SKILLS.list.map((s) => (
+      <div class="ench-row" data-tip={s.name} data-lore={s.lore} data-meta={`Level ${s.level}`}>
+        <div class="ench-lvl">{s.level}</div>
+        <div class="ench-name">{s.name}</div>
+        <div class="ench-bar"><div class="ench-fill" data-v={s.value}></div></div>
+        <div class="ench-cost">{s.value}</div>
+      </div>
+    ))}
+    <div class="gui-hint">{SKILLS.hint}</div>
+  </div>
+</section>

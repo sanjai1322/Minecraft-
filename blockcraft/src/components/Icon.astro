@@ -1,0 +1,16 @@
+---
+/* Renders one icon from site.config.js.
+
+   A value starting with "/" is treated as an image path and rendered
+   as <img>; anything else renders as literal text (an emoji, a tick,
+   an arrow). That means swapping emoji for real pixel art is a
+   string change in site.config.js and nothing else.
+
+   Images are sized in `em`, so they inherit whatever font-size the
+   surrounding slot already sets — no per-context CSS needed. */
+const { name, alt = '', class: cls } = Astro.props;
+const isImage = typeof name === 'string' && name.startsWith('/');
+---
+{isImage
+  ? <img class:list={['icon', cls]} src={name} alt={alt} draggable="false" />
+  : <span class:list={['icon', cls]} aria-hidden={alt ? undefined : 'true'}>{name}</span>}

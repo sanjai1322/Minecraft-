@@ -1,0 +1,22 @@
+---
+import { EXPERIENCE, ICONS } from '../../config/site.config.js';
+import Icon from '../Icon.astro';
+---
+<section class="screen" data-s="experience">
+  <div class="gui">
+    <div class="gui-title">{EXPERIENCE.title}</div>
+    {EXPERIENCE.recipes.map((r) => (
+      <div class="craft-row">
+        <div class="craft-inputs">
+          {r.inputs.map((i) => (<div class="slot"><Icon name={i} /></div>))}
+        </div>
+        <div class="craft-arrow"><Icon name={ICONS.arrow} /></div>
+        <div class="craft-out">
+          <div class="craft-year">{r.year}</div>
+          <div class="craft-name">{r.result}</div>
+          <div class="craft-lore">{r.lore}</div>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

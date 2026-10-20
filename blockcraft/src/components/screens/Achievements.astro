@@ -1,0 +1,22 @@
+---
+import { ADVANCEMENTS, ICONS } from '../../config/site.config.js';
+import Icon from '../Icon.astro';
+---
+<section class="screen" data-s="achievements">
+  <div class="gui">
+    <div class="gui-title">{ADVANCEMENTS.title}</div>
+    <div class="adv-grid">
+      {ADVANCEMENTS.list.map((a) => (
+        <div class={a.done ? 'adv done' : 'adv locked'}>
+          <div class="adv-ico"><Icon name={a.icon} /></div>
+          <div>
+            <div class="adv-name">{a.name}</div>
+            <div class="adv-lore">{a.lore}</div>
+          </div>
+          <div class="adv-tick"><Icon name={a.done ? ICONS.done : ICONS.locked} /></div>
+        </div>
+      ))}
+    </div>
+    <div class="mc-btn" data-go={ADVANCEMENTS.goTo}>Send a Message</div>
+  </div>
+</section>

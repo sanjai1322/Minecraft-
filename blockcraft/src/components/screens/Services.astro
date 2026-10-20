@@ -1,0 +1,33 @@
+---
+import { ICONS, TRADES } from '../../config/site.config.js';
+import Icon from '../Icon.astro';
+---
+<section class="screen" data-s="services">
+  <div class="gui">
+    <div class="trade-head">
+      <div class="gui-title" style="margin:0">{TRADES.title}</div>
+      <div class="trade-lvl">{TRADES.subtitle}</div>
+    </div>
+    {TRADES.list.map((t) => (
+      <div class="trade-row" data-tip={t.name} data-lore={t.lore} data-meta={t.stock}>
+        <div class="trade-give">
+          <span class="em"><Icon name={t.give} /></span>
+          <span class="trade-qty">{t.giveQty}</span>
+        </div>
+        <div class="trade-arrow"><Icon name={ICONS.arrow} /></div>
+        <div class="trade-get"><Icon name={t.get} alt={t.name} /></div>
+        <div class="trade-body">
+          <div class="trade-name">{t.name}</div>
+          <div class="trade-lore">{t.lore}</div>
+        </div>
+        <div class="trade-stock">{t.stock}</div>
+      </div>
+    ))}
+    <div class="trade-stats">
+      {TRADES.stats.map((s) => (
+        <div class="tstat"><b>{s.number}</b><span>{s.label}</span></div>
+      ))}
+    </div>
+    <div class="mc-btn" data-go={TRADES.goTo}>Make an Offer</div>
+  </div>
+</section>

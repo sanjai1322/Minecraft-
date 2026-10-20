@@ -1,0 +1,46 @@
+---
+import { SITE } from '../config/site.config.js';
+---
+<div class="hud">
+  <div class="world-info">
+    <div>{SITE.worldName} <b id="wi-version">v{SITE.version}</b></div>
+    <div>Biome: <b id="wi-biome">Plains</b></div>
+    <div id="wi-time">Day 1 · 06:00</div>
+  </div>
+
+  <div class="bars">
+    <div class="hearts" id="hearts"></div>
+    <div class="hunger" id="hunger"></div>
+  </div>
+  <div class="xp-wrap"><div class="xp-fill" id="xp-fill"></div></div>
+  <div class="xp-level" id="xp-level">0</div>
+</div>
+
+<div class="toast" id="toast">
+  <div class="toast-ico" id="toast-ico">⭐</div>
+  <div>
+    <div class="toast-kicker">Advancement Made!</div>
+    <div class="toast-name" id="toast-name">Taking Inventory</div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip">
+  <div class="tooltip-name" id="tip-name"></div>
+  <div class="tooltip-lore" id="tip-lore"></div>
+  <div class="tooltip-meta" id="tip-meta"></div>
+</div>
+
+<div class="f3" id="f3">
+  <div class="f3-l">
+    <span>Minecraft 1.21 (portfolio/vanilla)</span><br>
+    <span id="f3-fps">60 fps</span><br>
+    <span id="f3-xyz">XYZ: 128.00 / 72.00 / -340.00</span><br>
+    <span id="f3-block">Block: 128 72 -340</span><br>
+    <span id="f3-biome">Biome: minecraft:plains</span>
+  </div>
+  <div class="f3-r">
+    <span>Astro 5 · GSAP</span><br>
+    <span>Built by Sanjai</span><br>
+    <span id="f3-mem">Mem: 42% 1024/2048MB</span>
+  </div>
+</div>

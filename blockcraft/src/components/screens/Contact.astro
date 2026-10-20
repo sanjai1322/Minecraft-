@@ -1,0 +1,23 @@
+---
+import { CONTACT } from '../../config/site.config.js';
+import Icon from '../Icon.astro';
+---
+<section class="screen" data-s="contact">
+  <div class="book">
+    <div class="book-head">{CONTACT.heading}</div>
+    <div class="book-intro">{CONTACT.intro}</div>
+    {CONTACT.links.map((l) => (
+      <a class="book-line" href={l.url || undefined}
+         target={l.url && !l.url.startsWith('mailto') ? '_blank' : undefined}
+         rel={l.url ? 'noopener noreferrer' : undefined}>
+        <div class="book-ico"><Icon name={l.icon} alt={l.label} /></div>
+        <div>
+          <div class="book-l">{l.label}</div>
+          <div class="book-v">{l.value}</div>
+        </div>
+      </a>
+    ))}
+    <div class="book-page">Page 1 of 1</div>
+    <div class="mc-btn" data-go={CONTACT.goTo}>To The End</div>
+  </div>
+</section>

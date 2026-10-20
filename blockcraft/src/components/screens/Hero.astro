@@ -1,0 +1,29 @@
+---
+import { SITE, TITLE } from '../../config/site.config.js';
+---
+<section class="screen" data-s="hero">
+  <div class="title-screen">
+    <div class="logo-wrap">
+      <div class="mc-logo" id="mc-logo">{SITE.worldName}</div>
+      <div class="splash" id="splash-text"></div>
+    </div>
+
+    <div class="mc-sub">{SITE.worldSubtitle}</div>
+
+    <div class="menu">
+      {TITLE.stack.map((b) => (
+        <div class="mc-btn menu-btn" data-go={b.go}>{b.label}</div>
+      ))}
+      <div class="menu-row">
+        {TITLE.row.map((b) => (
+          <div class="mc-btn menu-btn" data-go={b.go}>{b.label}</div>
+        ))}
+      </div>
+      <button class="mc-btn menu-btn menu-play" id="mg-open" type="button">{TITLE.play}</button>
+    </div>
+
+    <div class="title-hint">{TITLE.hint}</div>
+  </div>
+
+  <div class="title-footer">{TITLE.footer}</div>
+</section>

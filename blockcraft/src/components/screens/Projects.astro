@@ -1,0 +1,22 @@
+---
+import { PROJECTS } from '../../config/site.config.js';
+import Icon from '../Icon.astro';
+---
+<section class="screen" data-s="projects">
+  <div class="gui">
+    <div class="gui-title">{PROJECTS.title}</div>
+    <div class="chest-grid">
+      {PROJECTS.items.map((p) => (
+        <a class="slot" href={p.url || undefined}
+           target={p.url ? '_blank' : undefined}
+           rel={p.url ? 'noopener noreferrer' : undefined}
+           data-tip={p.name} data-lore={p.lore} data-meta={p.rarity}>
+          <Icon name={p.icon} alt={p.name} /><span class={`rarity-dot rarity-${p.rarity}`}></span>
+        </a>
+      ))}
+      {[1,2,3,4,5,6].map(() => (<div class="slot empty"></div>))}
+    </div>
+    <div class="gui-hint">{PROJECTS.hint}</div>
+    <div class="mc-btn" data-go={PROJECTS.goTo}>See Trades</div>
+  </div>
+</section>

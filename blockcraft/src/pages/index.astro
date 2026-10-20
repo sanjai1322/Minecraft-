@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import Loading from '../components/Loading.astro';
+import Hotbar from '../components/Hotbar.astro';
+import Hud from '../components/Hud.astro';
+import Minigame from '../components/Minigame.astro';
+
+import Hero from '../components/screens/Hero.astro';
+import About from '../components/screens/About.astro';
+import Skills from '../components/screens/Skills.astro';
+import Projects from '../components/screens/Projects.astro';
+import Experience from '../components/screens/Experience.astro';
+import Achievements from '../components/screens/Achievements.astro';
+import Services from '../components/screens/Services.astro';
+import Contact from '../components/screens/Contact.astro';
+import Outro from '../components/screens/Outro.astro';
+
+import { SCREENS, SETTINGS } from '../config/site.config.js';
+---
+<Base>
+  <Loading />
+  <main class="stage" id="stage" data-screen="hero">
+    <div class="plates">
+      {SCREENS.map((s) => (
+        <div class="plate" data-id={s.id} data-src={s.frame}
+             data-missing={s.loop ? 'false' : 'true'}
+             data-label={`${s.biome} — add ${s.frame.split('/').pop()}`}
+             style={`--f0:${s.fallback[0]};--f1:${s.fallback[1]};--f2:${s.fallback[2]}`}>
+          {s.loop && (
+            <video autoplay muted loop playsinline preload="none" poster={s.frame}>
+              <source src={s.loop} type="video/webm" />
+              <source src={s.loop.replace(/\.webm$/, '.mp4')} type="video/mp4" />
+            </video>
+          )}
+        </div>
+      ))}
+    </div>
+
+    <div class="dim" id="dim"></div>
+
+    <Hero /><About /><Skills /><Projects /><Experience />
+    <Achievements /><Services /><Contact /><Outro />
+
+    <Hud />
+    <Hotbar />
+    <Minigame />
+  </main>
+
+  {SETTINGS.showKeyHints && (
+    <div class="keys">
+      <span><kbd>1</kbd>&ndash;<kbd>9</kbd> select</span>
+      <span><kbd>&larr;</kbd><kbd>&rarr;</kbd> cycle</span>
+      <span><kbd>M</kbd> mine</span>
+      <span><kbd>Esc</kbd> home</span>
+      <span><kbd>F3</kbd> debug</span>
+    </div>
+  )}
+</Base>
+
+<script>
+  import { initApp } from '../scripts/app.js';
+  initApp();
+</script>
